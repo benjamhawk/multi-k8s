@@ -1,0 +1,16 @@
+ # Specify the base image to use
+ FROM node:16-alpine
+
+  # Specify the working directory in the container
+ WORKDIR '/app'
+
+# Copy package.json file before npm install within container
+ COPY ./package.json ./
+
+ RUN npm install
+
+# Copy the rest of the code over
+ COPY . . 
+
+# Set command to run when container is started
+ CMD [ "npm", "run", "start" ]
