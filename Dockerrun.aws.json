@@ -1,0 +1,38 @@
+{
+  "AWSEBDockerVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "client",
+      "image": "benjamhawk/multi-client",
+      "hostname": "client",
+      "essential": false
+    },
+    {
+      "name": "server",
+      "image": "benjamhawk/multi-server",
+      "hostname": "api",
+      "essential": false
+    },
+    {
+      "name": "worker ",
+      "image": "benjamhawk/multi-worker",
+      "hostname": "worker",
+      "essential": false
+    },
+    {
+      "name": "nginx",
+      "image": "benjamhawk/multi-nginx",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "hostPort": 80
+        }
+      ],
+      "links": [
+        "client",
+        "server"        
+      ]
+    }
+  ]
+}
