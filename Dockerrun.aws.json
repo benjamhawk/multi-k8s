@@ -1,28 +1,32 @@
 {
-  "AWSEBDockerVersion": 2,
+  "AWSEBDockerrunVersion": 2,
   "containerDefinitions": [
     {
       "name": "client",
       "image": "benjamhawk/multi-client",
       "hostname": "client",
-      "essential": false
+      "essential": false,
+      "memory": 128
     },
     {
       "name": "server",
       "image": "benjamhawk/multi-server",
       "hostname": "api",
-      "essential": false
+      "essential": false,
+      "memory": 128
     },
     {
-      "name": "worker ",
+      "name": "worker",
       "image": "benjamhawk/multi-worker",
       "hostname": "worker",
-      "essential": false
+      "essential": false,
+      "memory": 128
     },
     {
       "name": "nginx",
       "image": "benjamhawk/multi-nginx",
       "essential": true,
+      "memory": 128,
       "portMappings": [
         {
           "containerPort": 80,
