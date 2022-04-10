@@ -1,0 +1,78 @@
+How does kubectl apply work?
+
+1. config file gets passed off to kubernetes master server
+   a. master has a list of resposibilites which gets updated
+   b. if master realizes it's not running enough copies of
+   a pod, it will split the new number of pods to the running 
+   nodes(VMs)
+2. Docker that is installed in each Node(vm) wil download image
+from Docker hub
+3. Master will reach back out to nodes and make sure enough
+copies are running
+4. Master will continue to poll nodes to make sure enough 
+copies are running in case on fails or is killed. If it's 
+short then it will delegate one of the Nodes to respawn
+5. We developers only interact with the master server and never
+directly with a node.
+
+Imperative vs declarative deployments
+1. The process of the master server maintaining its list of 
+resposibilites, as noted above, is one of the most important
+concepts in Kubernetes.
+2. To deploy something, we update the desired state of the master
+with a config file
+3. The master server works constatnly to meet your desired state.
+4. Imperative we outline the steps to arrive at container setup.
+declarative we say what state it should be in and let the master
+make it happen.
+5. Kubernetes has commands to do both but we should try to do 
+declarative
+
+"Deployment" type
+1. deployment vs pods
+   a. pods are rarely used in production are are better for occasional dev purposes
+   b. Deployment is used to run one or more identical pods and is used in dev and prod envs
+   c. We don't usually use pods directly. Deployments will create them for us
+2. How to trigger deployment to redownload image after new image release: kubectl rollout restart -f Deployment.yml
+
+Cluster IP Service type
+exposes ip address to the other pods in the application
+
+Volumes for databases
+Why is it needed?
+1. We need to store data in a persistent location
+2. If the data is stored within the container itself then it will be lost
+   when the container is destroyed
+3. If the data is stored on a separate volume then it will be preserved
+   when the container is destroyed
+What is a volume in Kubernetes?
+1. Volumes in Kubernetes are an object that allows a container to store data at the pod level
+2. A regular "volume" does not persist over pod restart, only when a container within the pod restarts
+3. A "persistent volume" is a volume that persists over pod restart and sits outside the pod
+4. A "persistent volume claim" is a claim to storage space for a persistent volume
+   a. statically provisioned persistent volume is created ahead of time
+   b. dynamically provisioned persistent volume is created when the pod is created
+Where does Kubernetes allocate storage space for pesistant volumes?
+1. If running locally, it will allocate a slice of the hard drive
+2. If running on a cloud provider, it will allocate space in some default storage location (ie. Aws block storage)
+
+"key" type
+1. key is an object type that stores a secret key (ie. db password)
+2. no config file, we add this imperatively
+
+"Load balancer" type
+1. Legacy way of getting network traffic into a cluster
+2. Sits in from of a single set of pods
+3. Will reach out to cloud provider to create a load balancer
+
+"Ingress" Service
+1. Ingress is a way of getting traffic into a cluster
+2. Several different community implementations of ingress (ie. nginx ingress)
+
+
+
+
+
+
+
+

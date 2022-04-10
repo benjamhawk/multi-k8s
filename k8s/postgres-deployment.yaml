@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: postgres
+  template:
+    metadata:
+      labels:
+        component: postgres
+    spec:
+      # point to a volume claim
+      # requests for allocated space for storage
+      volumes:
+      - name: postgres-volume
+      # name of the volume claim in database-persistent-volume-claim.yaml
+        persistentVolumeClaim:
+          claimName: database-persistent-volume-claim
+      containers:
+      - name: postgres
+        image: postgres
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        # point to the volume claim above for the locaction to store data
+          - name: postgres-volume
+          # mountPath is the path that postgres would normally store data on the container
+            mountPath: /var/lib/postgresql/data
+            # subPath is the folder that postgres will store data in on the volume
+            # this is needed specifically for the postgres
+            subPath: postgres
+        env:
+        # this is the name of the env variable that postgres is expecting in order
+        # to overwrite the default password
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                # this is the name given to the secret itself
+                name: pgpassword
+                # this is the key name given when the secret was created
+                key: PGPASSWORD
