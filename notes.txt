@@ -69,10 +69,7 @@ Where does Kubernetes allocate storage space for pesistant volumes?
 1. Ingress is a way of getting traffic into a cluster
 2. Several different community implementations of ingress (ie. nginx ingress)
 
+Helm
+Helm installs third party software to our cluster
 
-
-
-
-
-
-
+RBAC (Role-Based Access Control)Manages authorization decisions, allowing admins to dynamically configure access policies through the Kubernetes API.

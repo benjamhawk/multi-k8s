@@ -1,12 +1,57 @@
+# 1. Install Google Cloud SDK CLI
+# 2. configure the sdk with our gcp auth info
+# 3. login to docker cli
+# 4. build the test version of multi-client
+# 5. run tests
+# 6. if tests are successful, run a script to deploy newest images
+# 7. build all our images, tag each one, push each to docker hub
+# 8. apply all configs in the k8s folder
+# 9. imperatively set latest images on each deployment
+
 sudo: required
 
 services:
   - docker
 
+env:
+  global:
+    # create env variable of sha of the latest git commit to be used in deploy.sh
+    - SHA=$(git rev-parse --short HEAD)
+    # create env variable to disable any prompts from the cloud sdk
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+
 before_install: 
+  # we had created a service account file that gave us access to the
+  #  gcp kubernetes cluster. We then encrypted that file in travis ci.
+  # this command will then unecrypt the file and add it to the directory
+  #  during the travis build
   - openssl aes-256-cbc -K $encrypted_9f3b5599b056_key -iv $encrypted_9f3b5599b056_iv -in service-account.json.enc -out service-account.json -d
+  # this installs the google cloud sdk
   - curl https://sdk.cloud.google.com | bash > /dev/null;
   - source $HOME/google-cloud-sdk/path.bash.inc;
+  # this installs the kubectl command
   - gcloud components update kubectl;
+  # this authorizes travis ci to the google account with the unecrypted file
+  # from step 1
   - gcloud auth activate-service-account --key-file service-account.json;
-  
+  # set gcloud project
+  - gcloud config set project helical-root-346800;
+  - gcloud config set compute/zone us-central1-c;
+  - gcloud container clusters get-credentials multi-cluster;
+# login to docker cli
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
+  # build the client image
+  - docker build -t benjamhawk/react-test -f ./client/Dockerfile.dev ./client;
+
+script: 
+# run our react tests
+  - docker run -e CI=true benjamhawk/react-test npm test
+
+deploy:
+# here we are writing custom scripts for the deploy steps(6-9)
+  provider: script
+  script: bash ./deploy.sh
+  on:
+    branch: master
+
+
